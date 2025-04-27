@@ -1,7 +1,4 @@
 Flask
-yt-dlp
-pytube
-requests
+youtube_transcript_api
 googletrans==4.0.0rc1
 gunicorn
-youtube_transcript_api
