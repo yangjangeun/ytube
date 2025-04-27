@@ -1,0 +1,6 @@
+Flask
+yt-dlp
+pytube
+requests
+googletrans==4.0.0rc1
+gunicorn
