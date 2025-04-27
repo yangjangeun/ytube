@@ -4,3 +4,4 @@ pytube
 requests
 googletrans==4.0.0rc1
 gunicorn
+youtube_transcript_api
