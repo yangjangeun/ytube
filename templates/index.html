@@ -1,28 +1,138 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html>
 <head>
+    <title>YouTube 자막 추출</title>
     <meta charset="UTF-8">
-    <title>유튜브 자막 추출기</title>
+    <style>
+        body {
+            background-color: #1a1a1a;
+            color: white;
+            font-family: 'Noto Sans', 'Arial', 'Malgun Gothic', 'Noto Sans CJK', 'Noto Sans SC', 'Noto Sans KR', 'Segoe UI', 'Liberation Sans', 'DejaVu Sans', 'Arial Unicode MS', sans-serif;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .container {
+            width: 100%;
+            max-width: 800px;
+        }
+        input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            background-color: #333;
+            border: none;
+            color: white;
+            border-radius: 4px;
+        }
+        .button-container {
+            display: flex;
+            gap: 10px;
+            margin: 20px 0;
+        }
+        button {
+            padding: 10px 20px;
+            margin: 5px;
+            background-color: #333;
+            border: none;
+            color: white;
+            cursor: pointer;
+            border-radius: 4px;
+            flex: 1;
+        }
+        button:hover {
+            background-color: #444;
+        }
+        #extract {
+            background-color: #4285f4;
+        }
+        #extract:hover {
+            background-color: #2b75e0;
+        }
+        #translate {
+            background-color: #34a853;
+        }
+        #translate:hover {
+            background-color: #2d8d47;
+        }
+        #result {
+            width: 100%;
+            height: 300px;
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #333;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            resize: vertical;
+        }
+        body, textarea {
+            font-family: 'Noto Sans', 'Arial', 'Malgun Gothic', 'Noto Sans CJK', 'Noto Sans SC', 'Noto Sans KR', 'Segoe UI', 'Liberation Sans', 'DejaVu Sans', 'Arial Unicode MS', sans-serif;
+        }
+    </style>
 </head>
 <body>
-    <h1>유튜브 자막 추출기</h1>
-    <form id="form">
-        <input type="text" id="url" placeholder="유튜브 URL 입력" size="50">
-        <button type="submit">자막 추출</button>
-    </form>
-    <pre id="result"></pre>
+    <div class="container">
+        <h1>유튜브 동영상 자막 추출</h1>
+        <input type="text" id="url" placeholder="https://www.youtube.com/watch?v=...">
+        <select id="lang">
+            <option value="en">영어</option>
+            <option value="ko">한국어</option>
+            <option value="es">스페인어</option>
+            <option value="ja">일본어</option>
+            <option value="zh-Hans">중국어(간체)</option>
+            <option value="zh-Hant">중국어(번체)</option>
+            <option value="ru">러시아어</option>
+            <option value="ar">아랍어</option>
+            <option value="fr">프랑스어</option>
+            <option value="de">독일어</option>
+            <option value="it">이탈리아어</option>
+            <option value="pt">포르투갈어</option>
+            <option value="tr">터키어</option>
+            <option value="auto">(자동 감지)</option>
+        </select>
+        <div class="button-container">
+            <button id="extract" onclick="processVideo('extract')">텍스트 추출</button>
+            <button id="translate" onclick="processVideo('translate')">한국어로 번역</button>
+        </div>
+        <textarea id="result" readonly placeholder="결과가 여기에 표시됩니다..."></textarea>
+    </div>
+
     <script>
-        document.getElementById('form').onsubmit = async function(e) {
-            e.preventDefault();
+        async function processVideo(action) {
             const url = document.getElementById('url').value;
-            const res = await fetch('/extract', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({url})
-            });
-            const data = await res.json();
-            document.getElementById('result').textContent = data.text || data.error;
+            const lang = document.getElementById('lang').value;
+            const result = document.getElementById('result');
+            
+            if (!url) {
+                alert('YouTube URL을 입력해주세요.');
+                return;
+            }
+            
+            result.value = '처리 중...';
+            
+            try {
+                const response = await fetch(`/${action}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({url: url, lang: lang})
+                });
+                
+                const data = await response.json();
+                
+                if (data.error) {
+                    result.value = '오류: ' + data.error;
+                } else {
+                    result.value = data.text;
+                }
+            } catch (error) {
+                result.value = '오류가 발생했습니다: ' + error;
+            }
         }
     </script>
 </body>
-</html>
+</html> 
